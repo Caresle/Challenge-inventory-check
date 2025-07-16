@@ -1,3 +1,7 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
 public class Main {
     public static void main(String[] args) {
         // Tu código comienza aquí
@@ -71,9 +75,6 @@ class Producto {
     }
 }
 
-import java.util.ArrayList;
-import java.util.List;
-
 class Almacen {
     private String nombre;
     private List<Producto> productos;
@@ -89,12 +90,34 @@ class Almacen {
 
     public void compararInventario(Almacen otroAlmacen) {
         System.out.println("Comparando " + this.nombre + " con " + otroAlmacen.nombre + ":");
-        // TODO: Implementar la lógica para comparar los inventarios de los dos almacenes
-        // 1. Iterar sobre los productos del primer almacén (this.productos)
-        // 2. Para cada producto, buscar si existe en el otro almacén (otroAlmacen.productos)
-        // 3. Si el producto existe en ambos almacenes, comparar el stock
-        // 4. Si el stock es diferente, imprimir un mensaje indicando la diferencia
-        // 5. Si el producto no existe en el otro almacén, imprimir un mensaje indicando que no se encuentra
-        // 6. Repetir el proceso para los productos que están en el otro almacén pero no en el primero
+
+        for (Producto producto : productos) {
+            Optional<Producto> productoAComparar = otroAlmacen.productos.stream()
+                                                        .filter(p -> p.getCodigo().equals(producto.getCodigo()))
+                                                        .findFirst();
+
+            if (!productoAComparar.isPresent()) {
+                System.out.println("El producto" + " (" + producto.getCodigo() + ") " + producto.getNombre() + " no existe en " + otroAlmacen.nombre);
+                continue;
+            }
+
+            Producto comparar = productoAComparar.get();
+            
+            if (comparar.getStock() != producto.getStock()) {
+                System.out.println("El producto" + " (" + producto.getCodigo() + ") " + producto.getNombre() + " tiene un stock diferente en " + otroAlmacen.nombre);
+                int diferenciaStock = producto.getStock() - comparar.getStock();
+                String diferenciaStockAFavor = diferenciaStock > 0 ? "más en " + nombre : "menos en " + otroAlmacen.nombre;
+                System.out.println("Diferencia: " + Math.abs(diferenciaStock) + " unidades " + diferenciaStockAFavor);
+            }
+        }
+
+        List<Producto> otrosAlmacenProductosUnicos = new ArrayList<>(otroAlmacen.productos);
+        otrosAlmacenProductosUnicos.removeAll(productos);
+
+        System.out.println("Productos en " + otroAlmacen.nombre + " pero no en " + nombre + ":");
+
+        for (Producto producto: otrosAlmacenProductosUnicos)
+            System.out.println("El producto" + " (" + producto.getCodigo() + ") " + producto.getNombre() + " no existe en " + nombre);
+
     }
 }
